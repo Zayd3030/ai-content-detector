@@ -1,0 +1,45 @@
+# =========================
+# Python / Flask
+# =========================
+backend/.venv/
+backend/__pycache__/
+backend/**/*.pyc
+backend/.env
+
+# =========================
+# Node / React / Vite
+# =========================
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# =========================
+# General build / cache
+# =========================
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# =========================
+# Evaluation / Data
+# =========================
+datasets/
+evaluation/results.csv
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# OS / Misc
+# =========================
+*.swp
+*.swo
+
+# =========================
+# ZIPs / exports
+# =========================
+*.zip
