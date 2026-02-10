@@ -10,19 +10,23 @@ class OllamaClient:
 
     def generate(self, model: str, prompt: str) -> str:
         """
-        Calls Ollama /api/generate and returns the response text.
+        Uses Ollama OpenAI-compatible API:
+        POST /v1/chat/completions
         """
-        url = f"{self.base_url}/api/generate"
+        url = f"{self.base_url}/v1/chat/completions"
+
         payload = {
             "model": model,
-            "prompt": prompt,
-            "stream": False
+            "messages": [
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.1
         }
 
         try:
             resp = requests.post(url, json=payload, timeout=self.timeout_s)
             resp.raise_for_status()
             data = resp.json()
-            return (data.get("response") or "").strip()
+            return data["choices"][0]["message"]["content"].strip()
         except requests.RequestException as e:
             raise RuntimeError(f"Ollama request failed: {e}")

@@ -1,83 +1,113 @@
-import json
+import os
+import joblib
 from typing import Dict, Any
 
+from services.text_features import extract_text_features, FEATURE_KEYS
 from services.ollama_client import OllamaClient
 
+MODELS_PATH = os.path.join(os.path.dirname(__file__), "..", "models")
+MODELS_PATH = os.path.abspath(MODELS_PATH)
+BIN_PATH = os.path.join(MODELS_PATH, "ai_vs_human.pkl")
+ATTR_PATH = os.path.join(MODELS_PATH, "source_attrib.pkl")
 
-MODEL_NAME = "llama3"  # change if you want e.g. "mistral"
+# Use Ollama for explanation only
+EXPLAIN_MODEL = "llama3:latest"
+
+# Thresholds
+AI_THRESHOLD = 0.70
+ATTR_THRESHOLD = 0.60
 
 
-def _build_prompt(user_text: str) -> str:
-    """
-    We force the model to return strict JSON so the frontend can display it.
-    """
-    return f"""
-You are an AI-generated text detector. Classify the input as either "AI" or "HUMAN".
+def _load_model(path: str):
+    if not os.path.exists(path):
+        return None
+    return joblib.load(path)
 
-Return ONLY valid JSON in this exact format:
-{{
-  "label": "AI" or "HUMAN",
-  "confidence": number between 0 and 1,
-  "explanation": ["reason 1", "reason 2", "reason 3"]
-}}
 
-Rules:
-- confidence must be a float 0..1
-- explanation must be 3 short bullet-style strings
-- Do NOT include extra keys.
-- Do NOT wrap JSON in code fences.
+_bin = _load_model(BIN_PATH)
+_attr = _load_model(ATTR_PATH)
 
-TEXT:
-\"\"\"{user_text}\"\"\"
+
+def _explain(signals: Dict[str, float], label: str, confidence: float, source_guess: str | None) -> list[str]:
+    client = OllamaClient()
+    summary = "\n".join([f"- {k}: {signals[k]:.4f}" for k in FEATURE_KEYS])
+    src = source_guess if source_guess else "Unknown"
+
+    prompt = f"""
+You are explaining an AI-generated text detection decision for a university project.
+
+Given the measured signals below, produce 3 short bullet explanations (no numbering),
+each referencing at least one signal and how it supports the decision.
+
+Output only plain text, 3 lines, each starting with "- ".
+
+Decision:
+- label: {label}
+- confidence: {confidence:.2f}
+- source_guess: {src}
+
+Signals:
+{summary}
 """.strip()
+
+    raw = client.generate(EXPLAIN_MODEL, prompt)
+    lines = [l.strip() for l in raw.splitlines() if l.strip()]
+    bullets = [l if l.startswith("-") else f"- {l}" for l in lines][:3]
+    while len(bullets) < 3:
+        bullets.append("- Limited explanation available from current signals.")
+    return bullets
 
 
 def detect_text(user_text: str) -> Dict[str, Any]:
-    client = OllamaClient()
-    prompt = _build_prompt(user_text)
+    signals = extract_text_features(user_text)
+    X = [[signals[k] for k in FEATURE_KEYS]]
 
-    raw = client.generate(MODEL_NAME, prompt)
-
-    # Try to parse strict JSON
-    try:
-        parsed = json.loads(raw)
-        label = parsed.get("label")
-        confidence = parsed.get("confidence")
-        explanation = parsed.get("explanation")
-
-        # Basic validation / fallback
-        if label not in ["AI", "HUMAN"]:
-            raise ValueError("Invalid label")
-
-        if not isinstance(confidence, (int, float)):
-            raise ValueError("Invalid confidence")
-
-        confidence = max(0.0, min(1.0, float(confidence)))
-
-        if not isinstance(explanation, list):
-            explanation = []
-
-        explanation = [str(x) for x in explanation][:3]
-        while len(explanation) < 3:
-            explanation.append("No additional signal available.")
-
-        return {
-            "label": "AI-generated" if label == "AI" else "Human-written",
-            "confidence": confidence,
-            "explanation": explanation,
-            "model": MODEL_NAME
-        }
-
-    except Exception:
-        # Fallback: if model returns non-JSON, still responds
+    if _bin is None:
         return {
             "label": "Unknown",
             "confidence": 0.0,
+            "predicted_source": "Unknown",
+            "source_probs": {},
             "explanation": [
-                "Model did not return valid JSON.",
-                "Try a different Ollama model or prompt.",
-                "Check Ollama is running at OLLAMA_BASE_URL."
+                "Binary model not trained yet.",
+                "Run: python -m services.train_text_models after adding dataset files.",
+                "Signals are returned for debugging and evaluation."
             ],
-            "raw_output": raw[:500],
-            "model": MODEL_NAME
+            "signals": signals,
+            "model": "feature+ml"
         }
+
+    clf = _bin["model"]
+    proba = clf.predict_proba(X)[0]
+    classes = list(clf.classes_)
+    prob_map = {classes[i]: float(proba[i]) for i in range(len(classes))}
+
+    ai_prob = prob_map.get("AI", 0.0)
+    human_prob = prob_map.get("HUMAN", 0.0)
+
+    label = "AI-generated" if ai_prob >= 0.5 else "Human-written"
+    confidence = max(ai_prob, human_prob)
+
+    predicted_source = "Unknown"
+    source_probs = {}
+
+    if ai_prob >= AI_THRESHOLD and _attr is not None:
+        a_clf = _attr["model"]
+        a_proba = a_clf.predict_proba(X)[0]
+        a_classes = list(a_clf.classes_)
+        source_probs = {a_classes[i]: float(a_proba[i]) for i in range(len(a_classes))}
+        best_source = max(source_probs, key=source_probs.get)
+        if source_probs[best_source] >= ATTR_THRESHOLD:
+            predicted_source = best_source
+
+    explanation = _explain(signals, label, confidence, predicted_source)
+
+    return {
+        "label": label,
+        "confidence": float(confidence),
+        "predicted_source": predicted_source,
+        "source_probs": source_probs,
+        "explanation": explanation,
+        "signals": signals,
+        "model": "feature+ml"
+    }

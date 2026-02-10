@@ -59,6 +59,31 @@ export default function TextDetection() {
           <p><strong>Confidence:</strong> {Math.round(result.confidence * 100)}%</p>
           <p><strong>Model:</strong> {result.model}</p>
 
+          {result.predicted_source && (
+            <p><strong>Predicted Source:</strong> {result.predicted_source}</p>
+          )}
+
+          {result.source_probs && Object.keys(result.source_probs).length > 0 && (
+            <>
+              <h3>Source Probabilities</h3>
+              <ul>
+                {Object.entries(result.source_probs).map(([k, v]) => (
+                  <li key={k}>{k}: {Math.round(v * 100)}%</li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {result.signals && (
+            <>
+              <h3>Signals (debug)</h3>
+              <pre style={{ whiteSpace: "pre-wrap" }}>
+                {JSON.stringify(result.signals, null, 2)}
+              </pre>
+            </>
+          )}
+
+
           <h3>Explanation</h3>
           <ul>
             {result.explanation?.map((r, i) => (
