@@ -16,5 +16,11 @@ numpy==2.1.0
 # Video processing
 moviepy==1.0.3
 
-# Optional: logging & testing (safe to include)
+# logging & testing
 pytest==8.0.0
+
+scikit-learn==1.8.0
+
+joblib==1.4.2
+
+pandas==3.0.0
