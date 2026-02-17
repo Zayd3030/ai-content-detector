@@ -1,0 +1,22 @@
+Wind turbines are amazing machines that generate electricity from the wind! Here's how they work in simple terms:
+
+**Main Parts:**
+
+1. **Rotor Blades:** These are the long, thin wings that spin around when the wind blows.
+2. **Hub:** This is the central part where the blades attach.
+3. **Generator:** This is the part that converts the spinning energy into electricity.
+
+**How it Works:**
+
+1. **Wind Blows:** When the wind blows, it makes the rotor blades spin around the hub.
+2. **Energy Generation:** As the blades spin, they create a force called torque, which drives the generator to produce electricity.
+3. **Electricity Generation:** The generator uses the spinning energy to generate alternating current (AC) electricity.
+4. **Power Transmission:** The generated electricity is transmitted through cables to a power grid or used locally.
+
+**Key Points:**
+
+* Wind turbines work best when the wind blows steadily and consistently, like in open areas with minimal obstacles.
+* The rotor blades are designed to capture the kinetic energy of the wind and convert it into mechanical energy, which then generates electricity.
+* Modern wind turbines can generate enough electricity for hundreds or even thousands of homes!
+
+That's a basic overview of how wind turbines work!

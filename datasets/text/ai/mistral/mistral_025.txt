@@ -1,0 +1,11 @@
+Wind turbines convert the kinetic energy from the wind into mechanical power, which can then be used to generate electricity. Here's a simplified explanation of how they work:
+
+1. **Blade Design**: The wind turbine has three blades that are curved and aerodynamically designed to capture as much wind as possible. When the wind blows, it pushes against the blades, causing them to rotate.
+
+2. **Rotation**: As the blades rotate, they spin around a central hub connected to a shaft. This rotation is transferred through the shaft to the generator.
+
+3. **Conversion of Energy**: At the other end of the shaft is a generator, which converts the mechanical energy into electrical energy. The generator produces an alternating current (AC) that can be sent directly to the power grid or transformed for various uses.
+
+4. **Control Systems**: Modern wind turbines have sophisticated control systems that adjust the pitch of the blades and the direction they face to maximize energy capture based on wind speed and direction. These systems also help protect the turbine from extreme winds and other adverse conditions.
+
+5. **Grid Connection**: The generated electricity is sent through power lines to a substation, where it's connected to the main electrical grid for distribution to homes, businesses, and other consumers.

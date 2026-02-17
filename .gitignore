@@ -1,50 +1,37 @@
-# =========================
-# Python / Flask
-# =========================
-backend/.venv/
-backend/__pycache__/
-backend/**/*.pyc
-backend/.env
-backend/models/*.pkl
-backend/models/*.joblib
-backend/models/*.onnx
-backend/models/*.pt
-backend/models/*.h5
-
-# =========================
-# Node / React / Vite
-# =========================
-frontend/node_modules/
-frontend/dist/
-frontend/.env
-
-# =========================
-# General build / cache
-# =========================
-*.log
-*.tmp
+# OS / Editor
 .DS_Store
 Thumbs.db
-
-# =========================
-# Evaluation / Data
-# =========================
-datasets/
-evaluation/results.csv
-
-# ========================
-# IDE / Editor
-# =========================
 .vscode/
 .idea/
 
-# =========================
-# OS / Misc
-# =========================
-*.swp
-*.swo
+# Python
+backend/.venv/
+backend/__pycache__/
+backend/**/*.pyc
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.env
 
-# =========================
-# ZIPs / exports
-# =========================
+# Node (anywhere)
+**/node_modules/
+**/dist/
+**/.vite/
+**/.cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env
+.env
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+# Models / outputs
+backend/models/*.pkl
+backend/models/*.joblib
+backend/models/*.pt
+backend/models/*.onnx
+
+# Archives
 *.zip
