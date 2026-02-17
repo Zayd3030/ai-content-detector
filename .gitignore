@@ -32,7 +32,7 @@ Thumbs.db
 datasets/
 evaluation/results.csv
 
-# =========================
+# ========================
 # IDE / Editor
 # =========================
 .vscode/
