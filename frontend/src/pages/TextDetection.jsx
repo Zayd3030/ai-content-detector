@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { detectText } from "../services/api";
+import { motion } from "framer-motion";
 import GlowBackground from "../components/GlowBackground";
 import ResultCard from "../components/ResultCard";
 import SignalsAccordion from "../components/SignalsAccordion";

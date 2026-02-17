@@ -5,6 +5,11 @@ backend/.venv/
 backend/__pycache__/
 backend/**/*.pyc
 backend/.env
+backend/models/*.pkl
+backend/models/*.joblib
+backend/models/*.onnx
+backend/models/*.pt
+backend/models/*.h5
 
 # =========================
 # Node / React / Vite
