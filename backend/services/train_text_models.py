@@ -91,7 +91,7 @@ def train_attribution(df: pd.DataFrame):
         X, y, test_size=0.25, random_state=42, stratify=y
     )
 
-    clf = LogisticRegression(max_iter=3000, multi_class="auto")
+    clf = LogisticRegression(max_iter=3000)
     clf.fit(X_train, y_train)
 
     y_pred = clf.predict(X_test)
