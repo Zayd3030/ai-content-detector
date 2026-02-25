@@ -35,3 +35,19 @@ backend/models/*.onnx
 
 # Archives
 *.zip
+
+# dependencies
+node_modules/
+**/node_modules/
+
+# python
+backend/.venv/
+**/__pycache__/
+*.pyc
+
+# builds
+dist/
+build/
+
+# env
+.env

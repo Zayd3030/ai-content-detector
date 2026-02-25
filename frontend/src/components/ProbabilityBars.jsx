@@ -1,48 +1,39 @@
 import { motion } from "framer-motion";
 
 function Bar({ label, value, color }) {
-  const v = Math.max(0, Math.min(1, value));
-  const pct = Math.round(v * 100);
-
   return (
-    <div className="space-y-1">
+    <div className="mt-3">
       <div className="flex items-center justify-between text-xs text-slate-600">
-        <span className="font-medium">{label}</span>
-        <span>{pct}%</span>
+        <span>{label}</span>
+        <span className="font-mono">{Math.round(value * 100)}%</span>
       </div>
-
-      <div className="h-2.5 w-full rounded-full bg-slate-900/5 overflow-hidden">
+      <div className="mt-2 h-2 w-full rounded-full bg-slate-100">
         <motion.div
-          className="h-full rounded-full"
-          initial={{ width: 0 }}
-          animate={{ width: `${pct}%` }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="h-2 rounded-full"
           style={{ backgroundColor: color }}
+          initial={{ width: 0 }}
+          animate={{ width: `${Math.round(value * 100)}%` }}
+          transition={{ duration: 0.55, ease: [0.2, 0.8, 0.2, 1] }}
         />
       </div>
     </div>
   );
 }
 
-export default function ProbabilityBars({
-  aiProb = 0.5,
-  humanProb = 0.5,
-  sourceProbs = {},
-  showAttribution = false,
-}) {
+export default function ProbabilityBars({ aiProb, humanProb, accent, showAttribution, sourceProbs }) {
   return (
-    <div className="space-y-4">
-      <Bar label="AI probability" value={aiProb} color="#DC2626" />
-      <Bar label="Human probability" value={humanProb} color="#16A34A" />
+    <div>
+      <Bar label="AI probability" value={aiProb} color="#EF4444" />
+      <Bar label="Human probability" value={humanProb} color="#22C55E" />
 
-      {showAttribution && Object.keys(sourceProbs).length > 0 ? (
-        <div className="pt-3 border-t border-slate-900/10">
-          <div className="text-xs font-semibold text-slate-700 mb-3">Model attribution (AI only)</div>
-          <div className="space-y-3">
-            {Object.entries(sourceProbs)
+      {showAttribution ? (
+        <div className="mt-5">
+          <div className="text-xs font-semibold text-slate-700">Model attribution (AI only)</div>
+          <div className="mt-2 space-y-2">
+            {Object.entries(sourceProbs || {})
               .sort((a, b) => b[1] - a[1])
               .map(([k, v]) => (
-                <Bar key={k} label={k} value={v} color="#0F172A" />
+                <Bar key={k} label={k} value={v} color={accent} />
               ))}
           </div>
         </div>

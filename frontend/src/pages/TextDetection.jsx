@@ -1,15 +1,28 @@
-import { useMemo, useState } from "react";
-import { detectText } from "../services/api";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { detectText, health } from "../services/api";
 import GlowBackground from "../components/GlowBackground";
 import ResultCard from "../components/ResultCard";
 import SignalsAccordion from "../components/SignalsAccordion";
+import ShortTextWarning from "../components/ShortTextWarning";
 
 export default function TextDetection() {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
+  const [ollamaState, setOllamaState] = useState("down"); // ok/down
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const h = await health();
+        setOllamaState(h?.ollama === "ok" ? "ok" : "down");
+      } catch {
+        setOllamaState("down");
+      }
+    })();
+  }, []);
 
   const tint = useMemo(() => {
     const label = result?.label?.toLowerCase() || "";
@@ -28,7 +41,7 @@ export default function TextDetection() {
       const res = await detectText(text);
       setResult(res);
     } catch {
-      setError("Detection failed. Check backend is running and CORS is enabled.");
+      setError("Detection failed. Check backend is running.");
     } finally {
       setLoading(false);
     }
@@ -38,10 +51,7 @@ export default function TextDetection() {
     <div className="min-h-screen">
       <GlowBackground tint={tint} />
 
-      {/* Blur overlay when loading */}
-      {loading ? (
-        <div className="fixed inset-0 z-10 backdrop-blur-[2px] bg-white/30" />
-      ) : null}
+      {loading ? <div className="fixed inset-0 z-10 backdrop-blur-[2px] bg-white/30" /> : null}
 
       <div className="mx-auto max-w-6xl px-6 py-10">
         <div className="flex items-start justify-between gap-6">
@@ -51,15 +61,18 @@ export default function TextDetection() {
               Text analysis using linguistic signals + trained classifiers. Optional LLM explanation.
             </div>
           </div>
-
           <div className="text-xs text-slate-500">
             Backend: <span className="font-mono">/detect/text</span>
           </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="mt-6">
+          <ShortTextWarning text={text} />
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <ResultCard result={result} loading={loading} />
+            <ResultCard result={result} loading={loading} ollamaState={ollamaState} />
           </div>
           <div className="lg:col-span-1">
             <SignalsAccordion signals={result?.signals || {}} />
@@ -82,11 +95,11 @@ export default function TextDetection() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Paste text here…"
-            className="mt-3 w-full min-h-[160px] rounded-xl border border-slate-900/10 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none focus:ring-2 focus:ring-slate-900/10"
+            className="mt-3 w-full min-h-40 rounded-xl border border-slate-900/10 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none focus:ring-2 focus:ring-slate-900/10"
           />
 
           <div className="mt-4 flex items-center justify-between gap-4">
-            <div className="text-sm text-red-600">{error}</div>
+            <div className="text-sm text-rose-600">{error}</div>
 
             <button
               type="submit"
