@@ -86,8 +86,17 @@ def extract_image_features(pil_img: Image.Image) -> Dict[str, float]:
         "hf_ratio": hf_ratio
     }
 
-def detect_image(file_storage) -> Dict[str, Any]:
-    raw = file_storage.read()
+def detect_image(image_input) -> Dict[str, Any]:
+    """
+    Accepts either:
+    - Flask FileStorage (has .read())
+    - raw bytes
+    """
+    if hasattr(image_input, "read"):
+        raw = image_input.read()
+    else:
+        raw = image_input  # assume bytes
+
     pil_img = Image.open(io.BytesIO(raw))
 
     signals = extract_image_features(pil_img)
@@ -111,11 +120,12 @@ def detect_image(file_storage) -> Dict[str, Any]:
 
     clf = _bin["model"]
     proba = clf.predict_proba(X)[0]
-    classes = list(clf.classes_)  # ["AI","HUMAN"] order may vary
+    classes = list(clf.classes_)
     prob_map = {classes[i]: float(proba[i]) for i in range(len(classes))}
 
     ai_prob = prob_map.get("AI", 0.0)
     human_prob = prob_map.get("HUMAN", 0.0)
+
     label = "AI-generated" if ai_prob >= 0.5 else "Human-made"
     confidence = float(max(ai_prob, human_prob))
 
