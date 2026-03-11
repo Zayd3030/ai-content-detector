@@ -51,3 +51,20 @@ build/
 
 # env
 .env
+
+# ignore dataset
+datasets/
+
+# Ignore image datasets
+datasets/image/
+
+# Ignore video datasets
+datasets/video/
+
+# Ignore any dataset images
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.mp4
+*.mov
