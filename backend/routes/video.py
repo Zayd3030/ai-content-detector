@@ -1,11 +1,19 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, request, jsonify
+from services.video_detector import detect_video
 
-video_bp = Blueprint("video_bp", __name__, url_prefix="/detect")
+video_bp = Blueprint("video", __name__)
 
-
-@video_bp.post("/video")
+@video_bp.route("/detect/video", methods=["POST"])
 def detect_video_route():
-    return jsonify({
-        "error": "Not implemented yet",
-        "hint": "Video detection will be implemented."
-    }), 501
+    if "video" not in request.files:
+        return jsonify({"error": "No video file provided. Use form-data key 'video'."}), 400
+
+    f = request.files["video"]
+
+    if f.filename == "":
+        return jsonify({"error": "Empty filename."}), 400
+
+    video_bytes = f.read()
+    result = detect_video(video_bytes)
+
+    return jsonify(result), 200

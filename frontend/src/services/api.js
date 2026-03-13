@@ -18,6 +18,17 @@ export async function detectImage(file) {
   return res.data;
 }
 
+export async function detectVideo(file) {
+  const form = new FormData();
+  form.append("video", file);
+
+  const res = await axios.post(`${API_BASE}/detect/video`, form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
+  return res.data;
+}
+
 export async function health() {
   const res = await axios.get(`${API_BASE}/health`);
   return res.data;

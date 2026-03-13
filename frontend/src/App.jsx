@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import TextDetection from "./pages/TextDetection";
 import ImageDetection from "./pages/ImageDetection";
+import VideoDetection from "./pages/VideoDetection";
 
 export default function App() {
   return (
@@ -27,6 +28,16 @@ export default function App() {
               >
                 Image
               </NavLink>
+
+              <NavLink
+                to="/video"
+                className={({ isActive }) =>
+                  `px-3 py-1.5 rounded-lg text-sm ${isActive ? "bg-slate-900 text-white" : "text-slate-700 hover:bg-slate-100"
+                  }`
+                }
+              >
+                Video
+              </NavLink>
             </div>
           </div>
         </div>
@@ -35,6 +46,7 @@ export default function App() {
           <Route path="/" element={<TextDetection />} />
           <Route path="/text" element={<TextDetection />} />
           <Route path="/image" element={<ImageDetection />} />
+          <Route path="/video" element={<VideoDetection />} />
         </Routes>
       </div>
     </BrowserRouter>
